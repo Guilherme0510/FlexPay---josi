@@ -20,7 +20,7 @@ export const Login = () => {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [resetSuccess, setResetSuccess] = useState<string>("");
-  const [showCircles, setShowCircles] = useState<boolean>(false);
+  const [showCircles, setShowCircles] = useState<boolean>(true);
   const circlesRef = useRef<HTMLDivElement[]>([]);
   const navigate = useNavigate();
 
@@ -43,31 +43,6 @@ export const Login = () => {
       setError("Ocorreu um erro ao fazer login.");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handlePasswordReset = async () => {
-    setError("");
-    setResetSuccess("");
-
-    if (!recuperarEmail) {
-      setError("Por favor, insira o seu email.");
-      return;
-    }
-
-    if (!recuperarEmail.endsWith("@grupomapscartaodigital.com.br")) {
-      setError(
-        "Apenas emails com o domínio @grupomapscartaodigital.com.br podem receber a recuperação de senha."
-      );
-      return;
-    }
-
-    try {
-      await sendPasswordResetEmail(auth, recuperarEmail);
-      setResetSuccess("Um email de recuperação foi enviado.");
-    } catch (erro) {
-      console.log(erro);
-      setError("Erro ao enviar email de recuperação.");
     }
   };
 
@@ -117,6 +92,14 @@ export const Login = () => {
   return (
     <section>
       <div className="Home">
+        {showCircles &&
+          Array.from({ length: 6 }).map((_, index) => (
+            <div
+              key={index}
+              className={`circle ${showCircles ? "surging" : ""}`}
+              ref={(el) => el && (circlesRef.current[index] = el)}
+            ></div>
+          ))}
         <div className="container">
           <div className={`box-login ${recuperar ? "hidden" : ""}`}>
             <div className="title-box">
@@ -154,65 +137,8 @@ export const Login = () => {
               </button>
               {error && <div className="alert alert-danger mt-3">{error}</div>}
             </div>
-            <div className="text-center recuperar-senha">
-              <small>
-                Esqueceu a senha?
-                <Link
-                  to={""}
-                  onClick={recuperador_senha}
-                  className={recuperar ? "fazer-login" : "recuperar-senha"}
-                >
-                  {recuperar ? "Fazer Login" : " Recuperar Senha"}
-                </Link>
-              </small>
-            </div>
           </div>
         </div>
-
-        {recuperar && (
-          <div className="overlay">
-            {showCircles &&
-              Array.from({ length: 6 }).map((_, index) => (
-                <div
-                  key={index}
-                  className={`circle ${showCircles ? "surging" : ""}`}
-                  ref={(el) => el && (circlesRef.current[index] = el)}
-                ></div>
-              ))}
-
-            <div className="recuperar-senha-content text-center">
-              <h2>Recuperar Senha</h2>
-              <input
-                type="email"
-                placeholder="Digite seu email"
-                className="form-control"
-                value={recuperarEmail}
-                onChange={(e) => {
-                  setRecuperarEmail(e.target.value);
-                  setError("");
-                }}
-              />
-              <div className="btnsubmit">
-                <button
-                  onClick={handlePasswordReset}
-                  className="btn btn-recuperar btn-success mt-3"
-                >
-                  Enviar
-                </button>
-                <button
-                  onClick={() => setRecuperar(false)}
-                  className="btn btn-fechar btn-danger mt-3"
-                >
-                  <FontAwesomeIcon icon={faClose} />
-                </button>
-              </div>
-              {error && <div className="alert alert-danger mt-3">{error}</div>}
-              {resetSuccess && (
-                <div className="alert alert-success mt-3">{resetSuccess}</div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
     </section>
   );

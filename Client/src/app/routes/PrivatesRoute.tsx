@@ -6,20 +6,19 @@ import { ModalRoutes } from "./components/ModalRoutes";
 
 interface PrivateRouteProps {
   element: JSX.Element;
-  requiredCargo?: string;
 }
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ element, requiredCargo }) => {
-  const { user, loading, cargo } = useAuth();
+const PrivateRoute: React.FC<PrivateRouteProps> = ({ element }) => {
+  const { user, loading } = useAuth();
   const adminId = "";
   const [modalOpen, setModalOpen] = useState(false);
   const [redirect, setRedirect] = useState(false);
 
   useEffect(() => {
-    if (!loading && user && !(user.uid === adminId || !requiredCargo || cargo === requiredCargo)) {
+    if (!loading && user && !(user.uid === adminId)) {
       setModalOpen(true); 
     }
-  }, [loading, user, requiredCargo, cargo, adminId]);
+  }, [loading, user, adminId]);
 
   const handleCloseModal = () => {
     setModalOpen(false);
@@ -38,7 +37,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ element, requiredCargo }) =
     return <Navigate to="/" />; 
   }
 
-  if (user && (user.uid === adminId || !requiredCargo || cargo === requiredCargo)) {
+  if (user && (user.uid === adminId)) {
     return element; 
   }
 

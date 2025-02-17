@@ -6,8 +6,6 @@ import { browserSessionPersistence } from 'firebase/auth';
 interface AuthContextType {
   user: any; 
   nome: string;
-  avatar: string;
-  cargo: string;
   userId: string; 
   loading: boolean;
   logout: () => Promise<void>;
@@ -18,8 +16,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<any>(null);
   const [nome, setNome] = useState<string>('');
-  const [avatar, setAvatar] = useState<string>('');
-  const [cargo, setCargo] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,28 +39,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         if (docSnap.exists()) {
           const avatarUrl = docSnap.data()?.avatar || '';
-          const cargoUsuario = docSnap.data()?.cargo || '';
           console.log("Avatar carregado:", avatarUrl);
-          console.log("Cargo carregado:", cargoUsuario);
           setNome(nome);
-          setAvatar(avatarUrl);
-          setCargo(cargoUsuario); 
         } else {
           await setDoc(docRef, {
             nome: nome,
             email: email,
-            avatar: '',
-            cargo: ''
           });
           setNome(nome);
-          setAvatar('');
-          setCargo('');
         }
       } else {
         setUser(null);
         setNome('');
-        setAvatar('');
-        setCargo('');
       }
       setLoading(false);
     });
@@ -77,15 +63,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       await auth.signOut();
       setUser(null);
       setNome('');
-      setAvatar('');
-      setCargo('');
     } catch (error) {
       console.error("Erro ao deslogar:", error);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, nome, avatar, cargo, userId: user?.uid || '', loading, logout }}> {/* Adicionando userId aqui */}
+    <AuthContext.Provider value={{ user, nome, userId: user?.uid || '', loading, logout }}> {/* Adicionando userId aqui */}
       {children}
     </AuthContext.Provider>
   );
