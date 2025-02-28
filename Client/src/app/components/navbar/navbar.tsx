@@ -17,8 +17,6 @@ export const Navbar = () => {
     { to: "/home", icon: faHome, label: " Home" },
     { to: "/add", icon: faChartLine, label: " Adicionar Empresa" },
     { to: "/registro-empresas", icon: faChartLine, label: " Registro de empresas" },
-    { to: "/listnegative", icon: faTachometerAlt, label: " " },
-    { to: "/marketing", icon: faBullhorn, label: " Dashboards" },
     { to: "/lembretes", icon: faMoneyBillWave, label: " Lembretes" },
   ];
 
@@ -26,7 +24,8 @@ export const Navbar = () => {
     <nav className="sidebar open">
       <div className="sidebar-sticky">
         <div className="sidebar-logo">
-          <h2 className="mt-5 text-center">FlexPay</h2>
+          {/* <h2 className="mt-5 text-center">FlexPay</h2> */}
+          <img src={require("../../assets/logo-josi.jpg")} alt=""/>
         </div>
         <ul className="nav options mt-5">
           {menuItems.map((item, index) => (
@@ -47,6 +46,11 @@ export const Navbar = () => {
             Logout
           </button>
         </div>
+      </div>
+
+
+      <div className="copy">
+        <p>© 2025 Grupo Maps</p>
       </div>
     </nav>
   );

@@ -20,7 +20,10 @@
     text-align: center;
     margin-top: 20px;
 }
-
+.sidebar-logo img{
+    width: 120px;
+    border-radius: 10px;
+}
 .options {
     margin-top: auto;
     margin-bottom: auto;
@@ -188,4 +191,16 @@ main {
     main {
         margin-left: 0;
     }
+}
+
+.copy{
+    justify-content: center;
+    display: flex;
+    text-align: center;
+    margin-top: 50px;
+}
+
+.copy p{
+    font-size: small;
+    color: gray;
 }

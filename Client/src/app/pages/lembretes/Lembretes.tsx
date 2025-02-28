@@ -4,7 +4,14 @@ import "react-calendar/dist/Calendar.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./Lembretes.css";
-import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  onSnapshot,
+} from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -14,7 +21,9 @@ interface LembretesProps {
   calendarSize?: string;
 }
 
-export const Lembretes: React.FC<LembretesProps> = ({ calendarSize = "700px" }) => {
+export const Lembretes: React.FC<LembretesProps> = ({
+  calendarSize = "400px",
+}) => {
   const [reminders, setReminders] = useState<Record<string, string[]>>({});
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [reminderText, setReminderText] = useState("");
@@ -80,7 +89,10 @@ export const Lembretes: React.FC<LembretesProps> = ({ calendarSize = "700px" }) 
         const querySnapshot = await getDocs(reminderRef);
 
         querySnapshot.forEach(async (docSnapshot) => {
-          if (docSnapshot.data().date === selectedDate && docSnapshot.data().reminder === reminder) {
+          if (
+            docSnapshot.data().date === selectedDate &&
+            docSnapshot.data().reminder === reminder
+          ) {
             await deleteDoc(doc(db, "lembretes", docSnapshot.id));
             toast.success("Lembrete excluído!");
           }
@@ -104,60 +116,69 @@ export const Lembretes: React.FC<LembretesProps> = ({ calendarSize = "700px" }) 
       }
     }
 
-    const tileHeight = calendarSize === "700px" ? "150px" : calendarSize === "400px" ? "0px" : "40px";
+    const tileHeight =
+      calendarSize === "700px"
+        ? "150px"
+        : calendarSize === "400px"
+        ? "0px"
+        : "40px";
     return `tile-height-${tileHeight}`;
   };
 
   return (
     <>
-      {location.pathname === "/lembretes" && <h3 className="title-calendar">Calendario de Lembretes</h3>}
-
       <div className="lembretes-container">
-        <div className="calendar-box" style={{ width: calendarSize, height: calendarSize }}>
-          <Calendar
-            locale="pt-BR"
-            onClickDay={handleDateClick}
-            tileClassName={getTileClassName}
-          />
-        </div>
+        <h3 className="title-calendar">Calendario de Lembretes</h3>
 
-        {selectedDate && (
-          <div className="reminder-section">
-            <h4>Lembretes para {selectedDate}</h4>
+        <div className="row justify-center d-flex gap-5">
+          <div
+            className="calendar-box"
+            style={{ width: calendarSize, height: calendarSize }}
+          >
+            <Calendar
+              locale="pt-BR"
+              onClickDay={handleDateClick}
+              tileClassName={getTileClassName}
+            />
+          </div>
 
-            <div className="reminder-list">
-              {reminders[selectedDate]?.length ? (
-                reminders[selectedDate].map((reminder, index) => (
-                  <div key={index} className="reminder-item">
-                    <span>{reminder}</span>
-                    <FontAwesomeIcon
-                      icon={faTrash}
-                      className="delete-icon"
-                      onClick={() => handleDeleteReminder(reminder)}
-                    />
-                  </div>
-                ))
-              ) : (
-                <p>Não há lembretes para esta data.</p>
-              )}
-            </div>
+          {selectedDate && (
+            <div className="reminder-section">
+              <h4>Lembretes para {selectedDate}</h4>
 
-            <div className="add-reminder">
-              <input
-                type="text"
-                value={reminderText}
-                onChange={(e) => setReminderText(e.target.value)}
-                placeholder="Digite seu lembrete"
-                className="reminder-input"
-              />
-              <div className="reminder-buttons">
-                <button onClick={handleSave}>Salvar</button>
-                <button onClick={handleCancel}>Cancelar</button>
+              <div className="reminder-list">
+                {reminders[selectedDate]?.length ? (
+                  reminders[selectedDate].map((reminder, index) => (
+                    <div key={index} className="reminder-item">
+                      <span>{reminder}</span>
+                      <FontAwesomeIcon
+                        icon={faTrash}
+                        className="delete-icon"
+                        onClick={() => handleDeleteReminder(reminder)}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <p>Não há lembretes para esta data.</p>
+                )}
+              </div>
+
+              <div className="add-reminder">
+                <input
+                  type="text"
+                  value={reminderText}
+                  onChange={(e) => setReminderText(e.target.value)}
+                  placeholder="Digite seu lembrete"
+                  className="reminder-input"
+                />
+                <div className="reminder-buttons">
+                  <button onClick={handleSave}>Salvar</button>
+                  <button onClick={handleCancel}>Cancelar</button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-
+          )}
+        </div>
         <ToastContainer />
       </div>
     </>

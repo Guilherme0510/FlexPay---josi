@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import { Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -14,12 +13,14 @@ import {
   LineElement,
   ArcElement,
 } from "chart.js";
+import { Line } from "react-chartjs-2"; // Importando o gráfico de linha
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ToastContainer, toast } from "react-toastify";
-import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../../firebase/firebaseConfig";
 import { Lembretes } from "../../lembretes/Lembretes";
+import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
+import { Link } from "react-router-dom";
 
 ChartJS.register(
   CategoryScale,
@@ -34,210 +35,181 @@ ChartJS.register(
 );
 
 export const Main = () => {
-  const [entrada, setEntrada] = useState<any[]>([]);
+  const [empresa, setEmpresa] = useState<any[]>([]);
   const [saida, setSaida] = useState<any[]>([]);
+  const [totalEmpresas, setTotalEmpresas] = useState<number>(0);
+  const [empresasAtivasPorMes, setEmpresasAtivasPorMes] = useState<number[]>(
+    Array(12).fill(0)
+  ); // Array para contar empresas ativas por mês
 
-  const fetchPositivoData = async () => {
+  const fetchEmpresas = async () => {
     try {
+      // Consulta as 3 últimas empresas registradas
       const q = query(
-        collection(db, "registros"),
-        where("tipo", "==", "positivo")
+        collection(db, "empresas"),
+        orderBy("dataAbertura", "desc"),
+        limit(3)
       );
       const querySnapshot = await getDocs(q);
-      const registros: any[] = [];
-      querySnapshot.forEach((doc) => {
-        registros.push(doc.data());
+      const empresasLista: any[] = querySnapshot.docs.map((doc) => doc.data());
+      setEmpresa(empresasLista);
+
+      // Consulta o total de empresas registradas
+      const totalQuery = query(collection(db, "empresas"));
+      const totalSnapshot = await getDocs(totalQuery);
+      setTotalEmpresas(totalSnapshot.size); // Atualiza o total de empresas
+
+      // Contar empresas ativas por mês
+      const contadorMeses = Array(12).fill(0); // Inicializa um array com 12 posições (uma para cada mês)
+      totalSnapshot.docs.forEach((doc) => {
+        const emp = doc.data();
+        const meses = [
+          "janeiro",
+          "fevereiro",
+          "marco",
+          "abril",
+          "maio",
+          "junho",
+          "julho",
+          "agosto",
+          "setembro",
+          "outubro",
+          "novembro",
+          "dezembro",
+        ];
+        meses.forEach((mes, index) => {
+          if (emp[mes]) {
+            contadorMeses[index] += 1; // Incrementa o contador se a empresa estiver ativa no mês
+          }
+        });
       });
-      setEntrada(registros);
+      setEmpresasAtivasPorMes(contadorMeses); // Atualiza o estado com os dados
     } catch (error) {
-      console.error("Erro ao buscar dados positivos:", error);
+      console.error("Erro ao buscar empresas registradas:", error);
     }
-  };
-
-  const fetchNegativoData = async () => {
-    try {
-      const q = query(
-        collection(db, "registros"),
-        where("tipo", "==", "negativo")
-      );
-      const querySnapshot = await getDocs(q);
-      const registros: any[] = [];
-      querySnapshot.forEach((doc) => {
-        registros.push(doc.data());
-      });
-      setSaida(registros);
-    } catch (error) {
-      console.error("Erro ao buscar dados negativos:", error);
-    }
-  };
-
-  const totalEntradas = entrada.reduce((acc, entry) => acc + entry.valor, 0);
-  const totalSaidas = saida.reduce((acc, entry) => acc + entry.valor, 0);
-  const total = totalEntradas - totalSaidas;
-
-  const [chartData] = useState({
-    labels: entrada.map((entry) => entry.data),
-    datasets: [
-      {
-        label: "Entradas",
-        data: entrada.map((entry) => entry.valor),
-        borderColor: "green",
-        backgroundColor: "rgba(0, 255, 0, 0.1)",
-        fill: true,
-      },
-      {
-        label: "Saídas",
-        data: saida.map((entry) => entry.valor),
-        borderColor: "red",
-        backgroundColor: "rgba(255, 0, 0, 0.1)",
-        fill: true,
-      },
-    ],
-  });
-
-  const pieData = {
-    labels: ["Entradas", "Saídas"],
-    datasets: [
-      {
-        data: [totalEntradas, totalSaidas],
-        backgroundColor: ["green", "red"],
-      },
-    ],
-  };
-
-  const [value, setValue] = useState<Date | null>(new Date());
-  const [reminders, setReminders] = useState<Record<string, string>>({});
-  const [modal, setModal] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [reminderText, setReminderText] = useState("");
-
-  const handleDateClick = (date: Date) => {
-    const formattedDate = new Intl.DateTimeFormat("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    }).format(date);
-    setSelectedDate(formattedDate);
-    setModal(true);
-  };
-
-  const handleCancel = () => {
-    setModal(false);
-    setReminderText("");
-  };
-
-  const handleSave = () => {
-    if (reminderText) {
-      setReminders((prev) => ({
-        ...prev,
-        [selectedDate!]: reminderText,
-      }));
-      setModal(false);
-      setReminderText("");
-      toast.success(`Lembrete adicionado para o dia ${selectedDate}`);
-    }
-  };
-
-  const handleDeleteReminder = (date: string) => {
-    setReminders((prev) => {
-      const updatedReminders = { ...prev };
-      delete updatedReminders[date];
-      return updatedReminders;
-    });
-  };
-
-  const tileClassName = ({ date, view }: any) => {
-    if (view === "month") {
-      const formattedDate = new Intl.DateTimeFormat("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      }).format(date);
-      if (reminders[formattedDate]) {
-        return "highlight-reminder";
-      }
-    }
-    return null;
   };
 
   useEffect(() => {
-    fetchNegativoData();
-    fetchPositivoData();
+    fetchEmpresas();
   }, []);
+
+  const handleVerTodas = () => {
+    toast.info(
+      "Funcionalidade de ver todas as empresas ainda não implementada."
+    );
+  };
+
+  // Dados para o gráfico de linha
+  const data = {
+    labels: [
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro",
+    ],
+    datasets: [
+      {
+        label: "Empresas Concluidas",
+        data: empresasAtivasPorMes, // Dados das empresas ativas por mês
+        borderColor: "rgba(75, 192, 192, 1)", // Cor da linha
+        backgroundColor: "rgba(255, 255, 255, 255)", // Cor de fundo
+        fill: true,
+        tension: 0.4, // Suaviza a linha
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top" as const,
+      },
+      title: {
+        display: true,
+        text: "Empresas Ativas por Mês",
+      },
+    },
+  };
 
   return (
     <div className="main">
       <div className="main-boxes row">
         <div className="content-box col-md-3 col-10">
-          <h4 className="text-start">Entrada</h4>
+          <h4 className="text-start">Empresas Registradas</h4>
           <table className="mini-table">
             <tbody>
-              {entrada.slice(-3).map((entrada, index) => (
-                <tr key={index}>
-                  <td>{`R$ ${entrada.valor.toFixed(2)}`}</td>
-                  <td>{new Date(entrada.data).toLocaleDateString("pt-BR")}</td>
-                  <td>📈</td>
+              {empresa.map((emp, index) => (
+                <tr key={index} className="">
+                  <td className="">🏢 {emp.nomeFantasia}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          <Link to={"/registro-empresas"} className="btn btn-dark mt-2">
+            Ver Todas
+          </Link>
         </div>
-
-        <div className="content-box col-md-3 col-10">
-          <h4 className="text-start">Saída</h4>
-          <table className="mini-table">
-            <tbody>
-              {saida.slice(-3).map((saida, index) => (
-                <tr key={index}>
-                  <td>{`R$ ${saida.valor.toFixed(2)}`}</td>
-                  <td>{new Date(saida.data).toLocaleDateString("pt-BR")}</td>
-                  <td>📉</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
         <div className="content-box col-md-3 col-10">
           <h4 className="text-start">Total</h4>
           <div className="box">
-            <p>{`Total: R$ ${total.toFixed(2)}`}</p>
+            <p className="text-light m-2">{totalEmpresas}</p>
           </div>
         </div>
+        <div className="content-box-grafico col-md-3 col-10">
+          <h4 className="text-start">Atividade das Empresas</h4>
+          <Line data={data} options={options} />
+        </div>
       </div>
-
-      <div className="charts-container">
-        <div className="chart-box col-10 col-md-3">
-          <h4 className="text-start">Distribuição de Entradas e Saídas</h4>
-          <Pie
-            data={pieData}
-            options={{
-              responsive: true,
-              plugins: { legend: { position: "top" } },
-            }}
+      <div className="icons-sites flex gap-5">
+        <Link to="https://www.legisweb.com.br/" target="_blank">
+          <img
+            className="w-24 h-24 object-contain"
+            src={require("../../../assets/logo-legs.webp")}
+            alt=""
           />
-        </div>
-        <Lembretes calendarSize="400px" />
+        </Link>
+        <Link to="https://login.esocial.gov.br/login.aspx" target="_blank">
+          <img
+            className="w-24 h-24 object-contain"
+            src={require("../../../assets/logo-esocial.png")}
+            alt=""
+          />
+        </Link>
+        <Link
+          to="https://www8.receita.fazenda.gov.br/simplesnacional/"
+          target="_blank"
+        >
+          <img
+            className="w-24 h-24 object-contain"
+            src={require("../../../assets/logo_simples.png")}
+            alt=""
+          />
+        </Link>
+        <Link to="https://nfe.prefeitura.sp.gov.br/login.aspx" target="_blank">
+          <img
+            className="w-24 h-24 object-contain"
+            src={require("../../../assets/logo_milhao.png")}
+            alt=""
+          />
+        </Link>
+        <Link to="https://cav.receita.fazenda.gov.br/autenticacao/login" target="_blank">
+          <img
+            className="w-24 h-24 object-contain"
+            src={require("../../../assets/logo-federal.png")}
+            alt=""
+          />
+        </Link>
       </div>
-
-      {modal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Adicionar Lembrete</h3>
-            <input
-              type="text"
-              value={reminderText}
-              onChange={(e) => setReminderText(e.target.value)}
-              placeholder="Digite o lembrete"
-              className="modal-input"
-            />
-            <div className="modal-buttons">
-              <button onClick={handleSave}>Confirmar</button>
-              <button onClick={handleCancel}>Cancelar</button>
-            </div>
-          </div>
-        </div>
-      )}
+      
       <ToastContainer />
     </div>
   );

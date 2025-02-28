@@ -343,7 +343,7 @@ export const Add: React.FC = () => {
               />
             </div>
 
-            <div className="form-group col-md-4">
+            <div className="form-group col-md-4 mt-3">
               <label htmlFor="senhaPrefeitura" className="text-light">
                 Senha Prefeitura
               </label>
@@ -358,7 +358,7 @@ export const Add: React.FC = () => {
               />
             </div>
           </div>
-          <div className="col-md-12">
+          <div className="col-md-12 mt-5">
             <button
               type="button"
               onClick={handleSave}
