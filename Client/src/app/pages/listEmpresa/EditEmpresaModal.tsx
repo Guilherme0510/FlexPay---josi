@@ -95,9 +95,8 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
 
   return (
     <Modal.Body>
-      <div className="row g-">
-        {/* Coluna 1 */}
-        <div className="col-md-3">
+      <div className="row">
+        <div className="col-md-6">
           <div className="mb-3">
             <label className="form-label">Empresa</label>
             <input
@@ -170,9 +169,7 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
             />
           </div>
         </div>
-
-        {/* Coluna 2 */}
-        <div className="col-md-3">
+        <div className="col-md-6">
           <div className="mb-3">
             <label className="form-label">Fantasia</label>
             <input
@@ -245,9 +242,7 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
 
           </div>
         </div>
-
-        {/* Coluna 3 */}
-        <div className="col-md-3">
+        <div className="col-md-6">
           <div className="mb-3">
           <div className="mb-3">
               <label className="form-label">Logradouro</label>
@@ -301,9 +296,7 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
             ))}
           </div>
         </div>
-
-        {/* Coluna 4 - Links */}
-        <div className="col-md-3">
+        <div className="col-md-6">
           <div className="mb-3">
             <label className="form-label">Links</label>
             {selectedEmpresa.links &&
