@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTasks, faFileAlt, faUser, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
+import { faTasks, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
 
 interface Empresa {
   id: string;
@@ -48,7 +48,7 @@ export const ServicosModal: React.FC<EditServicoModalProps> = ({
 }) => {
   if (!selectedServico) return null;
 
-  const handleChange = (field: string, value: string) => {
+  const handleChange = (field: string, value: string | boolean) => {
     setSelectedServico((prev) => ({
       ...prev!,
       [field]: value,
@@ -65,7 +65,8 @@ export const ServicosModal: React.FC<EditServicoModalProps> = ({
     "simplesNacional",
     "declaracoes",
     "folha",
-    "observacoes"
+    "observacoes",
+    "parcelamento"
   ];
 
   return (
@@ -88,6 +89,19 @@ export const ServicosModal: React.FC<EditServicoModalProps> = ({
                       value={selectedServico[`${campo}${mes}`] || ""}
                       onChange={(e) => handleChange(`${campo}${mes}`, e.target.value)}
                     />
+                    {/* Checkbox para marcar o serviço */}
+                    <div className="form-check mt-2">
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id={`${campo}${mes}-check`}
+                        checked={selectedServico[`${campo}${mes}Check`] || false}
+                        onChange={(e) => handleChange(`${campo}${mes}Check`, e.target.checked)}
+                      />
+                      <label className="form-check-label" htmlFor={`${campo}${mes}-check`}>
+                        Serviço concluído
+                      </label>
+                    </div>
                   </div>
                 ))}
               </div>

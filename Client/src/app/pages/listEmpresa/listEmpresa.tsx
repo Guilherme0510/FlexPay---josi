@@ -15,6 +15,7 @@ import {
   faTrash,
   faArrowLeft,
   faArrowRight,
+  faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 import { Tooltip } from "react-tooltip";
 import { Button, Modal } from "react-bootstrap";
@@ -148,13 +149,27 @@ export const ListEmpresa = () => {
       }
     }
   };
-
-  const filteredEmpresas = listEmpresa.filter((empresa) =>
-    empresa.nomeEmpresa.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const [filterByMesAtual, setFilterByMesAtual] = useState<boolean | null>(
+    null
+  ); // null: sem filtro, true: concluídos, false: não concluídos
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const filteredEmpresas = listEmpresa.filter((empresa) => {
+    const matchesSearch = empresa.nomeEmpresa
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const isMesAtual = empresa[mesAtual] === true; // Verifica se a empresa está concluída
+
+    if (filterByMesAtual === null) {
+      return matchesSearch; // Sem filtro, mostra todas
+    }
+    if (filterByMesAtual) {
+      return matchesSearch && isMesAtual; // Apenas concluídas
+    }
+    return matchesSearch && !isMesAtual; // Apenas não concluídas
+  });
+
   const currentItems = filteredEmpresas.slice(
     indexOfFirstItem,
     indexOfLastItem
@@ -178,6 +193,22 @@ export const ListEmpresa = () => {
     <section className="list-container">
       <div className="header-list">
         <h1>Lista de Empresas</h1>
+
+        <button
+          className="btn btn-primary"
+          onClick={() =>
+            setFilterByMesAtual((prev) =>
+              prev === null ? true : prev === true ? false : null
+            )
+          }
+        >
+          <FontAwesomeIcon icon={faFilter} />
+          {filterByMesAtual === null
+            ? " Todos"
+            : filterByMesAtual
+            ? " Concluídos"
+            : " Não Concluídos"}
+        </button>
         <input
           type="text"
           className="input-pesquisa"
@@ -299,9 +330,9 @@ export const ListEmpresa = () => {
         centered
         size="xl"
       >
-      <Modal.Header>
-        <Modal.Title>Serviços Prestados</Modal.Title>
-      </Modal.Header>
+        <Modal.Header>
+          <Modal.Title>Serviços Prestados</Modal.Title>
+        </Modal.Header>
         <ServicosModal
           selectedServico={selectedServico}
           setSelectedServico={setSelectedServico}

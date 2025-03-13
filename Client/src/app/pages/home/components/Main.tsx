@@ -13,12 +13,11 @@ import {
   LineElement,
   ArcElement,
 } from "chart.js";
-import { Line } from "react-chartjs-2"; // Importando o gráfico de linha
+import { Line } from "react-chartjs-2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ToastContainer, toast } from "react-toastify";
 import { db } from "../../../firebase/firebaseConfig";
-import { Lembretes } from "../../lembretes/Lembretes";
 import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 import { Link } from "react-router-dom";
 
@@ -36,54 +35,42 @@ ChartJS.register(
 
 export const Main = () => {
   const [empresa, setEmpresa] = useState<any[]>([]);
-  const [saida, setSaida] = useState<any[]>([]);
   const [totalEmpresas, setTotalEmpresas] = useState<number>(0);
-  const [empresasAtivasPorMes, setEmpresasAtivasPorMes] = useState<number[]>(
-    Array(12).fill(0)
-  ); // Array para contar empresas ativas por mês
+  const [empresasAtivasPorMes, setEmpresasAtivasPorMes] = useState<number[]>(Array(12).fill(0));
+  const [empresasMesAtual, setEmpresasMesAtual] = useState<number>(0);
+  const [empresasInativas, setEmpresasInativas] = useState<number>(0);
 
   const fetchEmpresas = async () => {
     try {
-      // Consulta as 3 últimas empresas registradas
-      const q = query(
-        collection(db, "empresas"),
-        orderBy("dataAbertura", "desc"),
-        limit(3)
-      );
+      const q = query(collection(db, "empresas"), orderBy("dataAbertura", "desc"), limit(3));
       const querySnapshot = await getDocs(q);
       const empresasLista: any[] = querySnapshot.docs.map((doc) => doc.data());
       setEmpresa(empresasLista);
 
-      // Consulta o total de empresas registradas
       const totalQuery = query(collection(db, "empresas"));
       const totalSnapshot = await getDocs(totalQuery);
-      setTotalEmpresas(totalSnapshot.size); // Atualiza o total de empresas
+      setTotalEmpresas(totalSnapshot.size);
 
-      // Contar empresas ativas por mês
-      const contadorMeses = Array(12).fill(0); // Inicializa um array com 12 posições (uma para cada mês)
+      const contadorMeses = Array(12).fill(0);
+      let countMesAtual = 0;
+      const meses = ["janeiro", "fevereiro", "marco", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+      const mesAtualIndex = new Date().getMonth();
+
       totalSnapshot.docs.forEach((doc) => {
         const emp = doc.data();
-        const meses = [
-          "janeiro",
-          "fevereiro",
-          "marco",
-          "abril",
-          "maio",
-          "junho",
-          "julho",
-          "agosto",
-          "setembro",
-          "outubro",
-          "novembro",
-          "dezembro",
-        ];
         meses.forEach((mes, index) => {
           if (emp[mes]) {
-            contadorMeses[index] += 1; // Incrementa o contador se a empresa estiver ativa no mês
+            contadorMeses[index] += 1;
+            if (index === mesAtualIndex) {
+              countMesAtual += 1;
+            }
           }
         });
       });
-      setEmpresasAtivasPorMes(contadorMeses); // Atualiza o estado com os dados
+
+      setEmpresasAtivasPorMes(contadorMeses);
+      setEmpresasMesAtual(countMesAtual);
+      setEmpresasInativas(totalSnapshot.size - countMesAtual);
     } catch (error) {
       console.error("Erro ao buscar empresas registradas:", error);
     }
@@ -93,36 +80,16 @@ export const Main = () => {
     fetchEmpresas();
   }, []);
 
-  const handleVerTodas = () => {
-    toast.info(
-      "Funcionalidade de ver todas as empresas ainda não implementada."
-    );
-  };
-
-  // Dados para o gráfico de linha
   const data = {
-    labels: [
-      "Janeiro",
-      "Fevereiro",
-      "Março",
-      "Abril",
-      "Maio",
-      "Junho",
-      "Julho",
-      "Agosto",
-      "Setembro",
-      "Outubro",
-      "Novembro",
-      "Dezembro",
-    ],
+    labels: ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
     datasets: [
       {
-        label: "Empresas Concluidas",
-        data: empresasAtivasPorMes, // Dados das empresas ativas por mês
-        borderColor: "rgba(75, 192, 192, 1)", // Cor da linha
-        backgroundColor: "rgba(255, 255, 255, 255)", // Cor de fundo
+        label: "Empresas Concluídas",
+        data: empresasAtivasPorMes,
+        borderColor: "rgba(75, 192, 192, 1)",
+        backgroundColor: "rgba(255, 255, 255, 255)",
         fill: true,
-        tension: 0.4, // Suaviza a linha
+        tension: 0.4,
       },
     ],
   };
@@ -148,13 +115,13 @@ export const Main = () => {
           <table className="mini-table">
             <tbody>
               {empresa.map((emp, index) => (
-                <tr key={index} className="">
-                  <td className="">🏢 {emp.nomeFantasia}</td>
+                <tr key={index}>
+                  <td>🏢 {emp.nomeFantasia}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <Link to={"/registro-empresas"} className="btn btn-dark mt-2">
+          <Link to="/registro-empresas" className="btn btn-dark mt-2">
             Ver Todas
           </Link>
         </div>
@@ -162,6 +129,16 @@ export const Main = () => {
           <h4 className="text-start">Total</h4>
           <div className="box">
             <p className="text-light m-2">{totalEmpresas}</p>
+          </div>
+        </div>
+        <div className="content-box col-md-3 col-10">
+          <h4 className="text-start">Empresas Concluidas</h4>
+          <div className="box">
+            <p className="text-light m-2">{empresasMesAtual}</p>
+          </div>
+          <h4 className="text-start mt-2">Empresas Não concluidas</h4>
+          <div className="box">
+            <p className="text-light m-2">{empresasInativas}</p>
           </div>
         </div>
         <div className="content-box-grafico col-md-3 col-10">
@@ -201,7 +178,10 @@ export const Main = () => {
             alt=""
           />
         </Link>
-        <Link to="https://cav.receita.fazenda.gov.br/autenticacao/login" target="_blank">
+        <Link
+          to="https://cav.receita.fazenda.gov.br/autenticacao/login"
+          target="_blank"
+        >
           <img
             className="w-24 h-24 object-contain"
             src={require("../../../assets/logo-federal.png")}
@@ -209,7 +189,6 @@ export const Main = () => {
           />
         </Link>
       </div>
-      
       <ToastContainer />
     </div>
   );

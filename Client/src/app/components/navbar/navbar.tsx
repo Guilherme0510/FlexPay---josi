@@ -23,6 +23,8 @@ export const Navbar = () => {
     { to: "/home", icon: faHome, label: " Home" },
     { to: "/add", icon: faChartLine, label: " Adicionar Empresa" },
     { to: "/registro-empresas", icon: faChartLine, label: " Registro de empresas" },
+    { to: "/addirpf", icon: faChartLine, label: " Adicionar Pessoa Fisica" },
+    { to: "/registro-irpf", icon: faChartLine, label: " Registro de Pessoa Fisica" },
     { to: "/lembretes", icon: faMoneyBillWave, label: " Lembretes" },
   ];
 
