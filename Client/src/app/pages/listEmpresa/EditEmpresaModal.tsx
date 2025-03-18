@@ -168,6 +168,16 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
               onChange={(e) => handleChange("usernameSefaz", e.target.value)}
             />
           </div>
+          <div className="mb-3">
+            <label className="form-label">Código SN</label>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="CNAE"
+              value={selectedEmpresa?.codigoSN || ""}
+              onChange={(e) => handleChange("codigoSN", e.target.value)}
+            />
+          </div>
         </div>
         <div className="col-md-6">
           <div className="mb-3">
@@ -215,6 +225,17 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
           </div>
 
           <div className="mb-3">
+            <label className="form-label">CPF</label>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="CNAE"
+              value={selectedEmpresa?.cpf || ""}
+              onChange={(e) => handleChange("cpf", e.target.value)}
+            />
+          </div>
+
+          <div className="mb-3">
             <label className="form-label">Telefone</label>
             <input
               type="tel"
@@ -239,12 +260,11 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
                 <FontAwesomeIcon icon={showSenhaSefaz ? faEyeSlash : faEye} />
               </span>
             </div>
-
           </div>
         </div>
         <div className="col-md-6">
           <div className="mb-3">
-          <div className="mb-3">
+            <div className="mb-3">
               <label className="form-label">Logradouro</label>
               <input
                 type="text"

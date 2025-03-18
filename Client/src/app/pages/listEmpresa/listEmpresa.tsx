@@ -103,7 +103,7 @@ export const ListEmpresa = () => {
   const handleSave = async (empresa: Empresa) => {
     try {
       const empresaRef = doc(db, "empresas", empresa.id);
-      const empresaData = { ...empresa }; // Convertendo para um objeto simples
+      const empresaData = { ...empresa }; 
       await updateDoc(empresaRef, empresaData);
       setListEmpresa((prevList) =>
         prevList.map((emp) => (emp.id === empresa.id ? empresa : emp))
@@ -408,11 +408,11 @@ export const ListEmpresa = () => {
                 <p>
                   <strong>IE:</strong> {selectedEmpresa.ie}
                 </p>
+              </div>
+              <div className="empresa-details-column">
                 <p>
                   <strong>CCM:</strong> {selectedEmpresa.ccm}
                 </p>
-              </div>
-              <div className="empresa-details-column">
                 <p>
                   <strong>CNAE:</strong> {selectedEmpresa.cnae}
                 </p>
