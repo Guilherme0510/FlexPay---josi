@@ -38,6 +38,8 @@ export const ListIrpf = () => {
   );
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [filterEntregue, setFilterEntregue] = useState(false);
+
 
   useEffect(() => {
     const fetchInfoEmpresa = async () => {
@@ -99,20 +101,27 @@ export const ListIrpf = () => {
       }
     }
   };
-
-  const filteredEmpresas = listEmpresa.filter((empresa) =>
-    empresa.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  const handleToggleFilter = () => {
+    setFilterEntregue(!filterEntregue);
+  };
+  const filteredEmpresas = listEmpresa.filter(
+    (empresa) =>
+      empresa.nome.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (!filterEntregue || empresa.entregue === "Não Informado")
   );
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredEmpresas.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredEmpresas.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const totalPages = Math.ceil(filteredEmpresas.length / itemsPerPage);
 
   return (
     <section className="list-container">
       <div className="header-list">
         <h1>Lista de Empresas</h1>
+
         <input
           type="text"
           className="input-pesquisa"
@@ -120,6 +129,9 @@ export const ListIrpf = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+        <Button variant="warning" onClick={handleToggleFilter}>
+          {filterEntregue ? "Mostrar Todas" : "Não Informado"}
+        </Button>
       </div>
       <table className="empresa-table">
         <thead>
@@ -189,8 +201,7 @@ export const ListIrpf = () => {
                 value={selectedEmpresa?.nome || ""}
                 onChange={(e) =>
                   setSelectedEmpresa(
-                    (prev) =>
-                      prev && { ...prev, nome: e.target.value }
+                    (prev) => prev && { ...prev, nome: e.target.value }
                   )
                 }
               />
@@ -202,8 +213,7 @@ export const ListIrpf = () => {
                 value={selectedEmpresa?.entregue || ""}
                 onChange={(e) =>
                   setSelectedEmpresa(
-                    (prev) =>
-                      prev && { ...prev, entregue: e.target.value }
+                    (prev) => prev && { ...prev, entregue: e.target.value }
                   )
                 }
               />
