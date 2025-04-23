@@ -55,13 +55,14 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
 
   if (!selectedEmpresa) return null;
 
-  const handleChange = (field: keyof Empresa, value: string | boolean) => {
+  const handleChange = (field: keyof Empresa, value: string | boolean | string[]) => {
     setSelectedEmpresa((prev) => ({
       ...prev!,
       [field]: value,
-      links: prev?.links || [], // Garante que `links` nunca seja `undefined`
+      links: prev?.links || [],
     }));
   };
+  
 
   const handleLinkChange = (index: number, value: string) => {
     const newLinks = [...selectedEmpresa.links];
@@ -98,14 +99,13 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
     const [day, month, year] = date.split("/");
     return `${year}-${month}-${day}`;
   };
-  
+
   const convertToDisplayFormat = (date: string): string => {
     const [year, month, day] = date.split("-");
     return `${day}/${month}/${year}`;
   };
 
   return (
-    
     <Modal.Body>
       <div className="row">
         <div className="col-md-6">
@@ -121,23 +121,23 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
           </div>
 
           <div className="mb-3">
-  <label className="form-label">Data de Abertura</label>
-  <input
-    type="date"
-    className="form-control"
-    value={
-      selectedEmpresa?.dataAbertura
-        ? convertToDatabaseFormat(selectedEmpresa.dataAbertura)
-        : ""
-    }
-    onChange={(e) =>
-      handleChange(
-        "dataAbertura",
-        convertToDisplayFormat(e.target.value)
-      )
-    }
-  />
-</div>
+            <label className="form-label">Data de Abertura</label>
+            <input
+              type="date"
+              className="form-control"
+              value={
+                selectedEmpresa?.dataAbertura
+                  ? convertToDatabaseFormat(selectedEmpresa.dataAbertura)
+                  : ""
+              }
+              onChange={(e) =>
+                handleChange(
+                  "dataAbertura",
+                  convertToDisplayFormat(e.target.value)
+                )
+              }
+            />
+          </div>
 
           <div className="mb-3">
             <label className="form-label">Inscrição Estadual (IE)</label>
@@ -192,20 +192,42 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
           </div>
           <div className="mb-3">
             <label className="form-label">Categoria da Empresa</label>
-            <div className="input-group">
-            <select
-                name="categoriaEmpresa"
-                id="categoriaEmpresa"
-                value={selectedEmpresa?.categoriaEmpresa || ""}
-                className="form-select custom-select"
-                onChange={(e) => handleChange("categoriaEmpresa", e.target.value)}
-              >
-                <option value="">Selecione uma categoria</option>
-                <option value="movimento">Há Movimento</option>
-                <option value="naoHaMovimento">Não há movimento</option>
-                <option value="parcelamento">Parcelamento</option>
-                <option value="folhaPagamento">Folha de Pagamento</option>
-              </select>
+            <div className="d-flex flex-column gap-2">
+              {[
+                { label: "Há Movimento", value: "movimento" },
+                { label: "Não há movimento", value: "naoHaMovimento" },
+                { label: "Parcelamento", value: "parcelamento" },
+                { label: "Folha de Pagamento", value: "folhaPagamento" },
+              ].map((option) => (
+                <label
+                  key={option.value}
+                  className="form-check-label d-flex align-items-center gap-2"
+                >
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    value={option.value}
+                    checked={
+                      selectedEmpresa?.categoriaEmpresa?.includes(
+                        option.value
+                      ) || false
+                    }
+                    onChange={(e) => {
+                      const isChecked = e.target.checked;
+                      const current = selectedEmpresa?.categoriaEmpresa || [];
+                      const updatedCategorias = isChecked
+                        ? [...current, option.value]
+                        : current.filter((v) => v !== option.value);
+
+                      setSelectedEmpresa((prev) => ({
+                        ...prev!,
+                        categoriaEmpresa: updatedCategorias,
+                      }));
+                    }}
+                  />
+                  {option.label}
+                </label>
+              ))}
             </div>
           </div>
         </div>
@@ -291,7 +313,6 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
               </span>
             </div>
           </div>
-          
         </div>
         <div className="col-md-6">
           <div className="mb-3">

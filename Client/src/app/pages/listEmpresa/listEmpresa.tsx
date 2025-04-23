@@ -190,15 +190,35 @@ export const ListEmpresa = () => {
     }
   };
 
-  const renderCategoria = (empresa: Empresa) => {
-    const categoria = empresa.categoriaEmpresa;
-    if (!categoria || categoria.length === 0) return "Categoria não definida";
-    if (categoria.includes("naoHaMovimento")) return "Não há movimento";
-    if (categoria.includes("folhaPagamento")) return "Folha de Pagamento";
-    if (categoria.includes("parcelamento")) return "Parcelamento";
-    if (categoria.includes("movimento")) return "Há movimento";
-    return categoria.join(", ");
+  const renderCategoria = (empresa: any) => {
+    const categorias = empresa.categoriaEmpresa || [];
+    const maxCategorias = 1; 
+    
+    const categoriasTraduzidas = categorias.map((categoria: any) => {
+      switch (categoria) {
+        case "movimento":
+          return "Há Movimento";
+        case "naoHaMovimento":
+          return "Não há Movimento";
+        case "parcelamento":
+          return "Parcelamento";
+        case "folhaPagamento":
+          return "Folha de Pagamento";
+        default:
+          return categoria;
+      }
+    });
+  
+    // Verifica se o número de categorias é maior que o limite
+    if (categoriasTraduzidas.length > maxCategorias) {
+      const categoriasExibidas = categoriasTraduzidas.slice(0, maxCategorias);
+      return `${categoriasExibidas.join(", ")} e mais ${categoriasTraduzidas.length - maxCategorias}...`;
+    }
+  
+    return categoriasTraduzidas.join(", ");
   };
+  
+  
 
   return (
     <section className="list-container">
@@ -392,78 +412,83 @@ export const ListEmpresa = () => {
           <Modal.Title>Detalhes da Empresa</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {selectedEmpresa && (
-            <div className="empresa-details-grid">
-              <div className="empresa-details-column">
-                <p>
-                  <strong>Nome Fantasia:</strong> {selectedEmpresa.nomeFantasia}
-                </p>
-                <p>
-                  <strong>Nome Empresa:</strong> {selectedEmpresa.nomeEmpresa}
-                </p>
-                <p>
-                  <strong>CNPJ:</strong> {selectedEmpresa.cnpj}
-                </p>
-                <p>
-                  <strong>Email:</strong> {selectedEmpresa.email}
-                </p>
-                <p>
-                  <strong>Telefone:</strong> {selectedEmpresa.telefone}
-                </p>
-                <p>
-                  <strong>Data de Abertura:</strong>{" "}
-                  {selectedEmpresa.dataAbertura}
-                </p>
-                <p>
-                  <strong>Regime AP:</strong> {selectedEmpresa.regimeAP}
-                </p>
-                <p>
-                  <strong>IE:</strong> {selectedEmpresa.ie}
-                </p>
-                <p>
-                  <strong>Categoria da Empresa:</strong>{" "}
-                  <span className="text-capitalize">
-                    {selectedEmpresa.categoriaEmpresa.includes("naoHaMovimento")
-                      ? "Não há movimento"
-                      : selectedEmpresa.categoriaEmpresa.includes(
-                          "folhaPagamento"
-                        )
-                      ? "Folha de Pagamento"
-                      : selectedEmpresa.categoriaEmpresa}
-                  </span>
-                </p>
-              </div>
-              <div className="empresa-details-column">
-                <p>
-                  <strong>CCM:</strong> {selectedEmpresa.ccm}
-                </p>
-                <p>
-                  <strong>CNAE:</strong> {selectedEmpresa.cnae}
-                </p>
-                <p>
-                  <strong>Código SN:</strong> {selectedEmpresa.codigoSN}
-                </p>
-                <p>
-                  <strong>CPF:</strong> {selectedEmpresa.cpf}
-                </p>
-                <p>
-                  <strong>Logradouro:</strong> {selectedEmpresa.logradouro}
-                </p>
-                <p>
-                  <strong>Username Sefaz:</strong>{" "}
-                  {selectedEmpresa.usernameSefaz}
-                </p>
+          {selectedEmpresa &&
+            (console.log(selectedEmpresa),
+            (
+              <div className="empresa-details-grid">
+                <div className="empresa-details-column">
+                  <p>
+                    <strong>Nome Fantasia:</strong>{" "}
+                    {selectedEmpresa.nomeFantasia}
+                  </p>
+                  <p>
+                    <strong>Nome Empresa:</strong> {selectedEmpresa.nomeEmpresa}
+                  </p>
+                  <p>
+                    <strong>CNPJ:</strong> {selectedEmpresa.cnpj}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {selectedEmpresa.email}
+                  </p>
+                  <p>
+                    <strong>Telefone:</strong> {selectedEmpresa.telefone}
+                  </p>
+                  <p>
+                    <strong>Data de Abertura:</strong>{" "}
+                    {selectedEmpresa.dataAbertura}
+                  </p>
+                  <p>
+                    <strong>Regime AP:</strong> {selectedEmpresa.regimeAP}
+                  </p>
+                  <p>
+                    <strong>IE:</strong> {selectedEmpresa.ie}
+                  </p>
+                  <p>
+                    <strong>Categoria da Empresa:</strong>{" "}
+                    <span className="text-capitalize">
+                      {selectedEmpresa.categoriaEmpresa
+                        .map((categoria) => {
+                          if (categoria === "naoHaMovimento")
+                            return "Não há movimento";
+                          if (categoria === "folhaPagamento")
+                            return "Folha de Pagamento";
+                          return categoria;
+                        })
+                        .join(", ")}
+                    </span>
+                  </p>
+                </div>
+                <div className="empresa-details-column">
+                  <p>
+                    <strong>CCM:</strong> {selectedEmpresa.ccm}
+                  </p>
+                  <p>
+                    <strong>CNAE:</strong> {selectedEmpresa.cnae}
+                  </p>
+                  <p>
+                    <strong>Código SN:</strong> {selectedEmpresa.codigoSN}
+                  </p>
+                  <p>
+                    <strong>CPF:</strong> {selectedEmpresa.cpf}
+                  </p>
+                  <p>
+                    <strong>Logradouro:</strong> {selectedEmpresa.logradouro}
+                  </p>
+                  <p>
+                    <strong>Username Sefaz:</strong>{" "}
+                    {selectedEmpresa.usernameSefaz}
+                  </p>
 
-                <p>
-                  <strong>Senha Sefaz:</strong> {selectedEmpresa.senhaSefaz}
-                </p>
-                <p>
-                  <strong>Senha Prefeitura:</strong>{" "}
-                  {selectedEmpresa.senhaPrefeitura}
-                </p>
+                  <p>
+                    <strong>Senha Sefaz:</strong> {selectedEmpresa.senhaSefaz}
+                  </p>
+                  <p>
+                    <strong>Senha Prefeitura:</strong>{" "}
+                    {selectedEmpresa.senhaPrefeitura}
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            ))}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={() => setShowViewModal(false)}>

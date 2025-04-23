@@ -365,28 +365,38 @@ export const Add: React.FC = () => {
               <label htmlFor="senhaPrefeitura" className="text-light">
                 Categoria Empresa
               </label>
-              <select
-                name="categoriaEmpresa"
-                id="categoriaEmpresa"
-                value={formData.categoriaEmpresa}
-                className="form-select custom-select"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    categoriaEmpresa: Array.isArray(e.target.selectedOptions)
-                      ? Array.from(e.target.selectedOptions).map(
-                          (option) => option.value
-                        )
-                      : [e.target.value],
-                  })
-                }
-              >
-                <option value="">Selecione uma categoria</option>
-                <option value="movimento">Há Movimento</option>
-                <option value="naoHaMovimento">Não há movimento</option>
-                <option value="parcelamento">Parcelamento</option>
-                <option value="folhaPagamento">Folha de Pagamento</option>
-              </select>
+              <div className="d-flex flex-column gap-2">
+                {[
+                  { label: "Há Movimento", value: "movimento" },
+                  { label: "Não há movimento", value: "naoHaMovimento" },
+                  { label: "Parcelamento", value: "parcelamento" },
+                  { label: "Folha de Pagamento", value: "folhaPagamento" },
+                ].map((option) => (
+                  <div className="form-check" key={option.value}>
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      value={option.value}
+                      id={option.value}
+                      checked={formData.categoriaEmpresa.includes(option.value)}
+                      onChange={(e) => {
+                        const isChecked = e.target.checked;
+                        setFormData((prev) => ({
+                          ...prev,
+                          categoriaEmpresa: isChecked
+                            ? [...prev.categoriaEmpresa, option.value]
+                            : prev.categoriaEmpresa.filter(
+                                (v) => v !== option.value
+                              ),
+                        }));
+                      }}
+                    />
+                    <label className="form-check-label" htmlFor={option.value}>
+                      {option.label}
+                    </label>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
           <div className="col-md-12 mt-5">
@@ -401,11 +411,11 @@ export const Add: React.FC = () => {
         </form>
       </div>
       <ToastContainer
-        position="top-right" 
-        autoClose={3000} 
-        hideProgressBar={false} 
-        closeOnClick 
-        pauseOnHover 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
         draggable
       />
     </div>

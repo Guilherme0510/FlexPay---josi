@@ -292,16 +292,45 @@ const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
                 />
               </Form.Group>
 
-              <select
-                value={formData.categoriaEmpresa ?? []}
-                onChange={handleCategoriaChange}
-                className="form-control mt-4"
-              >
-                <option value="Há Movimento">Há Movimento</option>
-                <option value="Não há Movimento">Não há Movimento</option>
-                <option value="Folha de Pagamento">Folha de Pagamento</option>
-                <option value="Parcelamento">Parcelamento</option>
-              </select>
+              <div className="mb-3">
+                <label className="form-label">Categoria da Empresa</label>
+                <div className="d-flex flex-column gap-2">
+                  {[
+                    { label: "Há Movimento", value: "movimento" },
+                    { label: "Não há Movimento", value: "naoHaMovimento" },
+                    { label: "Parcelamento", value: "parcelamento" },
+                    { label: "Folha de Pagamento", value: "folhaPagamento" },
+                  ].map((option) => (
+                    <label
+                      key={option.value}
+                      className="form-check-label d-flex align-items-center gap-2"
+                    >
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        value={option.value}
+                        checked={
+                          formData.categoriaEmpresa?.includes(option.value) ||
+                          false
+                        }
+                        onChange={(e) => {
+                          const isChecked = e.target.checked;
+                          const current = formData.categoriaEmpresa || [];
+                          const updatedCategorias = isChecked
+                            ? [...current, option.value]
+                            : current.filter((v) => v !== option.value);
+
+                          setFormData({
+                            ...formData,
+                            categoriaEmpresa: updatedCategorias,
+                          });
+                        }}
+                      />
+                      {option.label}
+                    </label>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 

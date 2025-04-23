@@ -53,6 +53,7 @@ export const Main = () => {
 
   const fetchEmpresas = async () => {
     try {
+      // Últimas 3 empresas
       const q = query(
         collection(db, "empresas"),
         orderBy("dataAbertura", "desc"),
@@ -61,36 +62,32 @@ export const Main = () => {
       const querySnapshot = await getDocs(q);
       const empresasLista: any[] = querySnapshot.docs.map((doc) => doc.data());
       setEmpresa(empresasLista);
-
+  
+      // Todas as empresas
       const totalQuery = query(collection(db, "empresas"));
       const totalSnapshot = await getDocs(totalQuery);
       setTotalEmpresas(totalSnapshot.size);
-
+  
       const contadorMeses = Array(12).fill(0);
       let countMesAtual = 0;
       const meses = [
-        "janeiro",
-        "fevereiro",
-        "marco",
-        "abril",
-        "maio",
-        "junho",
-        "julho",
-        "agosto",
-        "setembro",
-        "outubro",
-        "novembro",
-        "dezembro",
+        "janeiro", "fevereiro", "marco", "abril", "maio", "junho",
+        "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
       ];
       const mesAtualIndex = new Date().getMonth();
       const mesAtualNome = meses[mesAtualIndex];
-
+  
       const inaptas: Record<string, number> = {};
-
+  
       totalSnapshot.docs.forEach((doc) => {
         const emp = doc.data();
-        const categoria = emp.categoriaEmpresa || "Sem Categoria";
-
+        const categorias: string[] = Array.isArray(emp.categoriaEmpresa)
+          ? emp.categoriaEmpresa
+          : emp.categoriaEmpresa
+          ? [emp.categoriaEmpresa]
+          : ["Sem Categoria"];
+  
+        // Conta empresa ativa por mês
         meses.forEach((mes, index) => {
           if (emp[mes]) {
             contadorMeses[index] += 1;
@@ -99,12 +96,15 @@ export const Main = () => {
             }
           }
         });
-
+  
+        // Conta como inapta em cada categoria se não estiver ativa no mês atual
         if (!emp[mesAtualNome]) {
-          inaptas[categoria] = (inaptas[categoria] || 0) + 1;
+          categorias.forEach((categoria) => {
+            inaptas[categoria] = (inaptas[categoria] || 0) + 1;
+          });
         }
       });
-
+  
       setEmpresasAtivasPorMes(contadorMeses);
       setEmpresasMesAtual(countMesAtual);
       setEmpresasInativas(totalSnapshot.size - countMesAtual);
@@ -113,6 +113,7 @@ export const Main = () => {
       console.error("Erro ao buscar empresas registradas:", error);
     }
   };
+  
 
   useEffect(() => {
     fetchEmpresas();
@@ -196,6 +197,7 @@ export const Main = () => {
           <h4 className="text-start">Atividade das Empresas</h4>
           <Line data={data} options={options} />
         </div>
+        
         <div className="container-box-query col-md-3 col-10">
             <Link
               to="/registro-empresas/movimento"
