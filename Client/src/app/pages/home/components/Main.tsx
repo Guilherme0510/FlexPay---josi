@@ -208,7 +208,7 @@ export const Main = () => {
               </span>
               <h4 className="text-start">
                 <FontAwesomeIcon icon={faChartLine} className="me-2" />
-                Há Movimento
+                Com Movimento
               </h4>
             </Link>
 
@@ -221,7 +221,7 @@ export const Main = () => {
               </span>
               <h4 className="text-start">
                 <FontAwesomeIcon icon={faBan} className="me-2" />
-                Não há Movimento
+                Sem Movimento
               </h4>
             </Link>
         </div>

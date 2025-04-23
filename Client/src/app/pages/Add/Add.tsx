@@ -367,8 +367,8 @@ export const Add: React.FC = () => {
               </label>
               <div className="d-flex flex-column gap-2">
                 {[
-                  { label: "Há Movimento", value: "movimento" },
-                  { label: "Não há movimento", value: "naoHaMovimento" },
+                  { label: "Com Movimento", value: "movimento" },
+                  { label: "Sem movimento", value: "naoHaMovimento" },
                   { label: "Parcelamento", value: "parcelamento" },
                   { label: "Folha de Pagamento", value: "folhaPagamento" },
                 ].map((option) => (

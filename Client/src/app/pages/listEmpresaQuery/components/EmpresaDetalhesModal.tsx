@@ -87,7 +87,9 @@ const EmpresaDetalhesModal: React.FC<EmpresaDetalhesModalProps> = ({
                   {empresa.categoriaEmpresa
                     .map((categoria) => {
                       if (categoria === "naoHaMovimento")
-                        return "Não há movimento";
+                        return "Sem movimento";
+                      if (categoria === "movimento")
+                        return "Com movimento";
                       if (categoria === "folhaPagamento")
                         return "Folha de Pagamento";
                       return categoria; 

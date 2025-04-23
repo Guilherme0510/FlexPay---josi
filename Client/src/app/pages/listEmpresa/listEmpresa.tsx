@@ -190,6 +190,56 @@ export const ListEmpresa = () => {
     }
   };
 
+  // const definirTodasComoNaoDefinida = async () => {
+  //   try {
+  //     const empresasRef = collection(db, "empresas");
+  //     const snapshot = await getDocs(empresasRef);
+  
+  //     const promises = snapshot.docs.map((docSnap) => {
+  //       return updateDoc(doc(empresasRef, docSnap.id), {
+  //         categoriaEmpresa: ["categoriaNaoDefinida"],
+  //       });
+  //     });
+  
+  //     await Promise.all(promises);
+  //     console.log("Todas as empresas atualizadas com sucesso!");
+  //   } catch (error) {
+  //     console.error("Erro ao atualizar empresas:", error);
+  //   }
+  // };
+
+  // const removerCategoriaNaoDefinidaDasEmpresas = async () => {
+  //   try {
+  //     const empresasRef = collection(db, "empresas");
+  //     const snapshot = await getDocs(empresasRef);
+  
+  //     const promises = snapshot.docs
+  //       .filter((docSnap) => {
+  //         const data = docSnap.data();
+  //         return (
+  //           Array.isArray(data.categoriaEmpresa) &&
+  //           data.categoriaEmpresa.includes("categoriaNaoDefinida")
+  //         );
+  //       })
+  //       .map((docSnap) => {
+  //         const data = docSnap.data();
+  //         const novaCategoria = data.categoriaEmpresa.filter(
+  //           (cat: string) => cat !== "categoriaNaoDefinida"
+  //         );
+  
+  //         return updateDoc(doc(empresasRef, docSnap.id), {
+  //           categoriaEmpresa: novaCategoria,
+  //         });
+  //       });
+  
+  //     await Promise.all(promises);
+  //     console.log("Categoria 'categoriaNaoDefinida' removida das empresas com sucesso!");
+  //   } catch (error) {
+  //     console.error("Erro ao atualizar empresas:", error);
+  //   }
+  // };
+  
+
   const renderCategoria = (empresa: any) => {
     const categorias = empresa.categoriaEmpresa || [];
     const maxCategorias = 1; 
@@ -197,9 +247,9 @@ export const ListEmpresa = () => {
     const categoriasTraduzidas = categorias.map((categoria: any) => {
       switch (categoria) {
         case "movimento":
-          return "Há Movimento";
+          return "Com Movimento";
         case "naoHaMovimento":
-          return "Não há Movimento";
+          return "Sem Movimento";
         case "parcelamento":
           return "Parcelamento";
         case "folhaPagamento":
@@ -329,6 +379,12 @@ export const ListEmpresa = () => {
         >
           <FontAwesomeIcon icon={faArrowRight} />
         </button>
+        {/* <button
+          className="btn btn-danger mx-2"
+          onClick={removerCategoriaNaoDefinidaDasEmpresas}/>
+          <button
+          className="btn btn-warning mx-2"
+          onClick={definirTodasComoNaoDefinida}/> */}
       </div>
 
       <Modal
@@ -449,7 +505,9 @@ export const ListEmpresa = () => {
                       {selectedEmpresa.categoriaEmpresa
                         .map((categoria) => {
                           if (categoria === "naoHaMovimento")
-                            return "Não há movimento";
+                            return "Sem movimento";
+                          if (categoria === "movimento")
+                            return "Com movimento";
                           if (categoria === "folhaPagamento")
                             return "Folha de Pagamento";
                           return categoria;

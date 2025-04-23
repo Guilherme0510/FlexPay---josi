@@ -296,8 +296,8 @@ const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
                 <label className="form-label">Categoria da Empresa</label>
                 <div className="d-flex flex-column gap-2">
                   {[
-                    { label: "Há Movimento", value: "movimento" },
-                    { label: "Não há Movimento", value: "naoHaMovimento" },
+                    { label: "Com Movimento", value: "movimento" },
+                    { label: "Sem Movimento", value: "naoHaMovimento" },
                     { label: "Parcelamento", value: "parcelamento" },
                     { label: "Folha de Pagamento", value: "folhaPagamento" },
                   ].map((option) => (
@@ -350,7 +350,7 @@ const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
                       onChange={handleChange}
                     />
                     <label className="form-check-label" htmlFor={id}>
-                      {mes}
+                     <span className="text-capitalize">{mes}</span> 
                     </label>
                   </div>
                 );

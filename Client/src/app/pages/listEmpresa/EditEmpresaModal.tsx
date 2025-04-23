@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Modal } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
+import { db } from "../../firebase/firebaseConfig";
 
 interface Empresa {
   id: string;
@@ -79,6 +81,8 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
       links: prev?.links ? [...prev.links, ""] : [""],
     }));
   };
+
+
 
   const meses = [
     { label: "Janeiro", field: "janeiro" },
@@ -194,8 +198,8 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
             <label className="form-label">Categoria da Empresa</label>
             <div className="d-flex flex-column gap-2">
               {[
-                { label: "Há Movimento", value: "movimento" },
-                { label: "Não há movimento", value: "naoHaMovimento" },
+                { label: "Com Movimento", value: "movimento" },
+                { label: "Sem movimento", value: "naoHaMovimento" },
                 { label: "Parcelamento", value: "parcelamento" },
                 { label: "Folha de Pagamento", value: "folhaPagamento" },
               ].map((option) => (
@@ -242,7 +246,7 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
               onChange={(e) => handleChange("nomeFantasia", e.target.value)}
             />
           </div>
-
+          
           <div className="mb-3">
             <label className="form-label">Regime</label>
             <input
