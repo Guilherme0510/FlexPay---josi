@@ -5,7 +5,7 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
-
+import { toast, ToastContainer } from "react-toastify";
 interface FormData {
   nomeEmpresa: string;
   dataAbertura: string;
@@ -23,6 +23,7 @@ interface FormData {
   usernameSefaz: string;
   senhaSefaz: string;
   senhaPrefeitura: string;
+  categoriaEmpresa: Array<string>;
 }
 
 export const Add: React.FC = () => {
@@ -43,6 +44,7 @@ export const Add: React.FC = () => {
     usernameSefaz: "",
     senhaSefaz: "",
     senhaPrefeitura: "",
+    categoriaEmpresa: [],
   });
 
   const navigate = useNavigate();
@@ -53,7 +55,6 @@ export const Add: React.FC = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
   const handleSave = async () => {
     try {
       const registro = Object.fromEntries(
@@ -71,7 +72,10 @@ export const Add: React.FC = () => {
       );
 
       await addDoc(collection(db, "empresas"), registro);
-      alert("Registro salvo com sucesso!");
+      toast.success(`Empresa ${formData.nomeEmpresa} cadastrada com sucesso!`);
+      setTimeout(() => {
+        navigate("/home");
+      }, 3000);
       setFormData({
         nomeEmpresa: "",
         dataAbertura: "",
@@ -89,6 +93,7 @@ export const Add: React.FC = () => {
         usernameSefaz: "",
         senhaSefaz: "",
         senhaPrefeitura: "",
+        categoriaEmpresa: [],
       });
     } catch (error) {
       console.error("Erro ao salvar registro: ", error);
@@ -342,7 +347,6 @@ export const Add: React.FC = () => {
                 placeholder="Digite o Username Sefaz"
               />
             </div>
-
             <div className="form-group col-md-4 mt-3">
               <label htmlFor="senhaPrefeitura" className="text-light">
                 Senha Prefeitura
@@ -357,6 +361,33 @@ export const Add: React.FC = () => {
                 placeholder="Digite a Senha Prefeitura"
               />
             </div>
+            <div className="form-group col-md-4 mt-3">
+              <label htmlFor="senhaPrefeitura" className="text-light">
+                Categoria Empresa
+              </label>
+              <select
+                name="categoriaEmpresa"
+                id="categoriaEmpresa"
+                value={formData.categoriaEmpresa}
+                className="form-select custom-select"
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    categoriaEmpresa: Array.isArray(e.target.selectedOptions)
+                      ? Array.from(e.target.selectedOptions).map(
+                          (option) => option.value
+                        )
+                      : [e.target.value],
+                  })
+                }
+              >
+                <option value="">Selecione uma categoria</option>
+                <option value="movimento">Há Movimento</option>
+                <option value="naoHaMovimento">Não há movimento</option>
+                <option value="parcelamento">Parcelamento</option>
+                <option value="folhaPagamento">Folha de Pagamento</option>
+              </select>
+            </div>
           </div>
           <div className="col-md-12 mt-5">
             <button
@@ -369,6 +400,14 @@ export const Add: React.FC = () => {
           </div>
         </form>
       </div>
+      <ToastContainer
+        position="top-right" 
+        autoClose={3000} 
+        hideProgressBar={false} 
+        closeOnClick 
+        pauseOnHover 
+        draggable
+      />
     </div>
   );
 };

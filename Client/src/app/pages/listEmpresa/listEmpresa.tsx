@@ -52,6 +52,7 @@ interface Empresa {
   outubro: boolean;
   novembro: boolean;
   dezembro: boolean;
+  categoriaEmpresa: string[];
   links: string[];
   [key: string]: any; // Adicionando uma assinatura de índice
 }
@@ -103,7 +104,7 @@ export const ListEmpresa = () => {
   const handleSave = async (empresa: Empresa) => {
     try {
       const empresaRef = doc(db, "empresas", empresa.id);
-      const empresaData = { ...empresa }; 
+      const empresaData = { ...empresa };
       await updateDoc(empresaRef, empresaData);
       setListEmpresa((prevList) =>
         prevList.map((emp) => (emp.id === empresa.id ? empresa : emp))
@@ -151,7 +152,7 @@ export const ListEmpresa = () => {
   };
   const [filterByMesAtual, setFilterByMesAtual] = useState<boolean | null>(
     null
-  ); // null: sem filtro, true: concluídos, false: não concluídos
+  );
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -189,11 +190,20 @@ export const ListEmpresa = () => {
     }
   };
 
+  const renderCategoria = (empresa: Empresa) => {
+    const categoria = empresa.categoriaEmpresa;
+    if (!categoria || categoria.length === 0) return "Categoria não definida";
+    if (categoria.includes("naoHaMovimento")) return "Não há movimento";
+    if (categoria.includes("folhaPagamento")) return "Folha de Pagamento";
+    if (categoria.includes("parcelamento")) return "Parcelamento";
+    if (categoria.includes("movimento")) return "Há movimento";
+    return categoria.join(", ");
+  };
+
   return (
     <section className="list-container">
       <div className="header-list">
         <h1>Lista de Empresas</h1>
-
         <button
           className="btn btn-primary"
           onClick={() =>
@@ -224,6 +234,7 @@ export const ListEmpresa = () => {
             <th>CNPJ</th>
             <th>Email</th>
             <th>Telefone</th>
+            <th>Categoria</th>
             <th>Ações</th>
           </tr>
         </thead>
@@ -239,6 +250,7 @@ export const ListEmpresa = () => {
                 <td>{empresa.cnpj}</td>
                 <td>{empresa.email}</td>
                 <td>{empresa.telefone}</td>
+                <td>{renderCategoria(empresa)}</td>
                 <td className="">
                   <FontAwesomeIcon
                     icon={faEye}
@@ -408,6 +420,18 @@ export const ListEmpresa = () => {
                 <p>
                   <strong>IE:</strong> {selectedEmpresa.ie}
                 </p>
+                <p>
+                  <strong>Categoria da Empresa:</strong>{" "}
+                  <span className="text-capitalize">
+                    {selectedEmpresa.categoriaEmpresa.includes("naoHaMovimento")
+                      ? "Não há movimento"
+                      : selectedEmpresa.categoriaEmpresa.includes(
+                          "folhaPagamento"
+                        )
+                      ? "Folha de Pagamento"
+                      : selectedEmpresa.categoriaEmpresa}
+                  </span>
+                </p>
               </div>
               <div className="empresa-details-column">
                 <p>
@@ -429,6 +453,7 @@ export const ListEmpresa = () => {
                   <strong>Username Sefaz:</strong>{" "}
                   {selectedEmpresa.usernameSefaz}
                 </p>
+
                 <p>
                   <strong>Senha Sefaz:</strong> {selectedEmpresa.senhaSefaz}
                 </p>

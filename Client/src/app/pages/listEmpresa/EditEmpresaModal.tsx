@@ -33,6 +33,7 @@ interface Empresa {
   outubro: boolean;
   novembro: boolean;
   dezembro: boolean;
+  categoriaEmpresa: Array<string>;
   links: string[];
 }
 
@@ -93,7 +94,18 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
     { label: "Dezembro", field: "dezembro" },
   ];
 
+  const convertToDatabaseFormat = (date: string): string => {
+    const [day, month, year] = date.split("/");
+    return `${year}-${month}-${day}`;
+  };
+  
+  const convertToDisplayFormat = (date: string): string => {
+    const [year, month, day] = date.split("-");
+    return `${day}/${month}/${year}`;
+  };
+
   return (
+    
     <Modal.Body>
       <div className="row">
         <div className="col-md-6">
@@ -109,23 +121,23 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
           </div>
 
           <div className="mb-3">
-            <label className="form-label">Data de Abertura</label>
-            <input
-              type="date"
-              className="form-control"
-              value={
-                selectedEmpresa?.dataAbertura
-                  ? selectedEmpresa.dataAbertura.split("/").reverse().join("-")
-                  : ""
-              }
-              onChange={(e) =>
-                handleChange(
-                  "dataAbertura",
-                  e.target.value.split("-").reverse().join("/")
-                )
-              }
-            />
-          </div>
+  <label className="form-label">Data de Abertura</label>
+  <input
+    type="date"
+    className="form-control"
+    value={
+      selectedEmpresa?.dataAbertura
+        ? convertToDatabaseFormat(selectedEmpresa.dataAbertura)
+        : ""
+    }
+    onChange={(e) =>
+      handleChange(
+        "dataAbertura",
+        convertToDisplayFormat(e.target.value)
+      )
+    }
+  />
+</div>
 
           <div className="mb-3">
             <label className="form-label">Inscrição Estadual (IE)</label>
@@ -177,6 +189,24 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
               value={selectedEmpresa?.codigoSN || ""}
               onChange={(e) => handleChange("codigoSN", e.target.value)}
             />
+          </div>
+          <div className="mb-3">
+            <label className="form-label">Categoria da Empresa</label>
+            <div className="input-group">
+            <select
+                name="categoriaEmpresa"
+                id="categoriaEmpresa"
+                value={selectedEmpresa?.categoriaEmpresa || ""}
+                className="form-select custom-select"
+                onChange={(e) => handleChange("categoriaEmpresa", e.target.value)}
+              >
+                <option value="">Selecione uma categoria</option>
+                <option value="movimento">Há Movimento</option>
+                <option value="naoHaMovimento">Não há movimento</option>
+                <option value="parcelamento">Parcelamento</option>
+                <option value="folhaPagamento">Folha de Pagamento</option>
+              </select>
+            </div>
           </div>
         </div>
         <div className="col-md-6">
@@ -261,6 +291,7 @@ export const EditEmpresaModal: React.FC<EditEmpresaModalProps> = ({
               </span>
             </div>
           </div>
+          
         </div>
         <div className="col-md-6">
           <div className="mb-3">

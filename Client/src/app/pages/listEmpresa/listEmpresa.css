@@ -1,7 +1,7 @@
 .list-container {
   background-color: #206e64;
-  height: 100vh;
-  padding-left: 250px;
+  min-height: 100vh;
+  padding-left: 200px;
   padding-right: 50px;
 }
 

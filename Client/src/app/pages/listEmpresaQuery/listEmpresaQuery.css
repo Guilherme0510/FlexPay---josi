@@ -1,0 +1,66 @@
+.list-empresa-query {
+  background-color: #206e64;
+  min-height: 100vh;
+  padding-left: 250px;
+  padding-right: 50px;
+}
+
+.btn-filtro-query {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+.input-query {
+  width: 450px;
+}
+.pagination {
+  gap: 0.5rem;
+}
+
+.pagination .btn {
+  border-radius: 8px;
+  min-width: 36px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.pagination .btn:hover {
+  transform: scale(1.05);
+}
+
+.pagination .btn-primary {
+  background-color: #464444;
+  border-color: #464444;
+}
+
+.pagination .btn-outline-primary {
+  color: #464444;
+  border-color: #464444;
+}
+
+.pagination .btn-outline-primary:hover {
+  background-color: #464444;
+  color: white;
+}
+
+.pagination .btn-outline-secondary {
+  border-color: #ccc;
+  color: #555;
+}
+
+.pagination .btn-outline-secondary:hover {
+  background-color: #f0f0f0;
+}
+
+.pagination span {
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.4rem;
+  font-weight: bold;
+  color: #999;
+  font-size: 0.9rem;
+}

@@ -6,6 +6,7 @@ import { Navbar } from "../components/navbar/navbar";
 import { Lembretes } from "../pages/lembretes/Lembretes";
 import { AddIrpf } from "../pages/AddIrpf/AddIrpf";
 import { ListIrpf } from "../pages/listIrpf/listEmpresa";
+import ListEmpresaQuery from "../pages/listEmpresaQuery/ListEmpresaQuery";
 
 export const LocalRoutes: React.FC = () => {
   return (
@@ -20,6 +21,7 @@ export const LocalRoutes: React.FC = () => {
           <Route path="/addirpf" element={<AddIrpf />} />
           <Route path="/registro-irpf" element={<ListIrpf />} />
           <Route path="/lembretes" element={<Lembretes/>} />
+          <Route path="/registro-empresas/:categoria" element={<ListEmpresaQuery/>} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </BrowserRouter>
@@ -29,7 +31,13 @@ export const LocalRoutes: React.FC = () => {
 
 const NavbarWrapper: React.FC = () => {
   const location = useLocation();
-  const showNavbarRoutes = ["/home", '/lembretes', '/registro-empresas', "/registro-irpf"];
+  const path = location.pathname;
 
-  return showNavbarRoutes.includes(location.pathname) ? <Navbar /> : null;
+  const showNavbar =
+    path.startsWith("/home") ||
+    path.startsWith("/lembretes") ||
+    path.startsWith("/registro-empresas") ||
+    path.startsWith("/registro-irpf");
+
+  return showNavbar ? <Navbar /> : null;
 };

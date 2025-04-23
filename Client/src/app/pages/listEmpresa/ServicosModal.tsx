@@ -33,6 +33,7 @@ interface Empresa {
   outubro: boolean;
   novembro: boolean;
   dezembro: boolean;
+  categoriaEmpresa: Array<string>;
   links: string[];
   [key: string]: any;
 }
@@ -89,7 +90,6 @@ export const ServicosModal: React.FC<EditServicoModalProps> = ({
                       value={selectedServico[`${campo}${mes}`] || ""}
                       onChange={(e) => handleChange(`${campo}${mes}`, e.target.value)}
                     />
-                    {/* Checkbox para marcar o serviço */}
                     <div className="form-check mt-2">
                       <input
                         type="checkbox"
